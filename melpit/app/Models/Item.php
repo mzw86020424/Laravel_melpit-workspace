@@ -20,6 +20,14 @@ class Item extends Model
         // 第三引数にはリレーション先のカラム名を指定します。省略した場合はidが使われます。
     }
 
+    public function seller()
+    {
+        return $this->belongsTo(User::class, 'seller_id');
+    }
+    public function condition()
+    {
+        return $this->belongsTo(ItemCondition::class, 'item_condition_id');
+    }
     // IsStateSellingだけで参照できるようになる
     public function getIsStateSellingAttribute()
     {
