@@ -102,28 +102,19 @@ class ItemsController extends Controller
 
         try {
             $seller = User::lockForUpdate()->find($sellerID);
-            $item = Item::lockForUpdate()->find($itemID);
+            $item   = Item::lockForUpdate()->find($itemID);
 
             if ($item->isStateBought) {
                 throw new \Exception('多重決済');
             }
 
-            $item->state = Item::STATE_BOUGHT;
+            $item->state     = Item::STATE_BOUGHT;
             $item->bought_at = Carbon::now();
-            $item->buyer_id = $buyerID;
+            $item->buyer_id  = $buyerID;
             $item->save();
 
-            $seller->sales += $item->prive;
+            $seller->sales += $item->price;
             $seller->save();
-
-            $charge = Charge::create([
-                'card' => $token,
-                'amount' => $item->price,
-                'currency' => 'jpy'
-            ]);
-            if (!$charge->captured) {
-                throw new \Exception('支払い確定失敗');
-            }
         } catch (\Exception $e) {
             DB::rollBack();
             throw $e;
